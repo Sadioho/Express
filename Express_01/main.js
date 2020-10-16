@@ -1,13 +1,27 @@
 var express = require("express");
+var bodyParser = require('body-parser')
 var app = express();
-var port = 8080;
-app.get("/", function (request, response) {
-  response.send("<h1>Toi dang hoc expess</h1>");
-});
-app.get("/user", function (request, response) {
-  response.send("<h1>User List</h1>");
+
+var userRoutes = require('./routes/user.route')
+
+var port = 8000;
+
+app.set("views", "./views");
+app.set("view engine", "pug");
+
+app.use(bodyParser.json()) // for parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
+app.use(express.static('public'))
+
+app.get("/", function(req, res) {
+    res.render("index", {
+        name: "Toi dang hoc Express",
+    }); // trỏ đến cái file index.pug trong view
 });
 
-app.listen(port, function () {
-  console.log("server listening on port " + port);
+app.use('/users', userRoutes)
+
+app.listen(port, function() {
+    console.log("server listening on port " + port);
 });

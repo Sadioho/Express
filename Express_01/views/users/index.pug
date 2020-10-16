@@ -1,0 +1,32 @@
+extends ../layouts/common.pug
+
+block content
+  h1 User List
+      a(href="/users/create") New
+
+
+      form(action="/users/search",method="GET")
+        input(type="text",name='q',id='new-item',class="form-control")
+        button Search
+
+      ul
+      each user in users
+          li
+          span=user.name
+          span &nbsp
+          a(href="/users/"+user.id) View
+
+  script. 
+      var sessioninput=document.getElementById("new-item");   
+      sessioninput.addEventListener('change',updateSession);
+      sessioninput.value=sessionStorage.getItem('content');
+      function updateSession(){
+      sessionStorage.setItem('content',sessioninput.value);
+      }
+  //- 11 Khai báo 1 biến là session = id của input
+  //- 12 Dùng phương thức listener có sự kiện là change cho biến vừa tạo ở 11
+  //- 13 lấy giá trị trong sessionStorage để gán lại cho biến ở 11
+  //- 14 set dữ liệu vào trong sessionStorage
+    
+
+    
