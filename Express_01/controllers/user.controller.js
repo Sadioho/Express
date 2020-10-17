@@ -1,5 +1,6 @@
 var db = require('../db')
 var shortid = require('shortid');
+const { value } = require('../db');
 
 module.exports.index = function(req, res) {
     res.render("users/index", {
@@ -7,13 +8,8 @@ module.exports.index = function(req, res) {
     })
 }
 
-
 module.exports.search = function(req, res) {
     var q = req.query.q;
-    // console.log(req.query)
-    // var matchedUsers=users.filter(function(user){
-    //   return user.name.toLowerCase().indexOf(q.toLowerCase()) !== -1;
-    // });
     var matchedUsers = db.get('users').value().filter(function(user) {
         return user.name.toLowerCase().indexOf(q.toLowerCase()) !== -1;
     })
@@ -25,11 +21,11 @@ module.exports.search = function(req, res) {
 
 module.exports.create = function(req, res) {
     res.render('users/create')
+
 }
 
 module.exports.get = function(req, res) {
     var id = req.params.id;
-
     var user = db.get('users').find({ id: id }).value();
     res.render('users/view', {
         user: user
@@ -37,9 +33,25 @@ module.exports.get = function(req, res) {
 }
 
 module.exports.postCreate = function(req, res) {
-    // console.log(req.body);
-    // users.push(req.body);
     req.body.id = shortid.generate();
-    db.get('users').push(req.body).write(); //
+    var errors = [];
+
+    if (!req.body.name) {
+        errors.push("Name is required")
+    }
+    if (!req.body.phone) {
+        errors.push("Phone is required")
+    }
+
+    if (errors.length) {
+        res.render('users/create', {
+            errors: errors,
+            values: req.body // lưu trữ dữ liệu khi người dùng nhập vào
+
+        });
+        return
+    }
+
+    db.get('users').push(req.body).write();
     res.redirect('/users');
 }
